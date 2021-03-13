@@ -1,4 +1,4 @@
-package sample;
+package pigeon;
 
 public class Controller {
 }

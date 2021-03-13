@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+group 'com.pigeon'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 15
+targetCompatibility = 15
+mainClassName = 'pigeon.Main'
+
+application {
+    mainClassName = 'pigeon.Main'
+}
+
+javafx {
+    version = "14"
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.8.6'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.pigeon.Main'
+    }
+}
