@@ -53,6 +53,10 @@ public class ClientRequestParser {
                     this.clientRequest = new LogoutClientRequest();
                     this.clientRequest.checkAuth(this.request).processPayload(this.payload);
                 }
+                case "profile" -> {
+                    this.clientRequest = new ProfileClientRequest();
+                    this.clientRequest.checkAuth(this.request).processPayload(this.payload);
+                }
             }
         }catch(Exception ex){
             Logger.logException(ex, false);
