@@ -37,7 +37,7 @@ You can build and then run a Docker image out of this project: all you need is t
 You may want to change the storage directory when running as a Docker container, to do that simply mount your directory as a volume, here's an example:
 
 ```bash
-docker run -v /path/to/storage/dir:/app/storage -d --name pigeon-server pigeon-server:latest
+docker run -v /path/to/storage/dir:/storage -d --name pigeon-server enricosola/pigeon-server:latest
 ```
 
 ### Creating users
@@ -53,12 +53,18 @@ Or using Gradle:
 ./gradlew run --args="--useradd \"username\" \"password\""
 ```
 
+If you are running the server as a Docker container you can add new users using the following command:
+
+```bash
+docker exec pigeon-server pigeon_useradd "username" "password"
+````
+
 ### Sentry support
 The Pigeon server supports the Sentry error tracking platform: all you need to integrate the server with Sentry is your project DSN, declare an environment variable called `PIGEON_SENTRY_DSN` containing your DSN and then start the server.<br />
 If your running the server as a Docker container you may set the environment variable as docker run parameter, here's an example:
 
 ```bash
-docker run -e PIGEON_SENTRY_DSN="YOUR SENTRY DSN HERE" -d --name pigeon-server pigeon-server:latest
+docker run -e PIGEON_SENTRY_DSN="YOUR SENTRY DSN HERE" -d --name pigeon-server enricosola/pigeon-server:latest
 ```
 
 ### Data storage
@@ -68,5 +74,7 @@ Server stores its data under "storage" directory, you may set your own directory
 
 Currently, messages can be sent among the same server users, cross-server messaging may be added in the future.
 Additionally, messages are stored as files, while it may sound like a bad practice (and I think that too), it was an explicit requirement for this project. MongoDB support will be added in a near future alongside the file storage system.
+
+Tested on Apple macOS and RedHat Enterprise Linux 8, currently not tested on Microsoft Windows.
 
 Developed with ❤️ by [Enrico Sola](https://www.enricosola.com).
