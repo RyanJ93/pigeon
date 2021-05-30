@@ -13,6 +13,7 @@ public class ConsoleController {
         this.console = Console.getActiveConsole();
         this.console.getObservableValue().addListener((obs, oldValue, newValue) -> {
             this.consoleOutput.setText(this.console.getContents());
+            this.consoleOutput.setScrollTop(Double.MAX_VALUE);
         });
     }
 }

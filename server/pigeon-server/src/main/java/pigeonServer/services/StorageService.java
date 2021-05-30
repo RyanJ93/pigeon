@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -115,7 +114,10 @@ public class StorageService {
         return this.entity;
     }
 
-    public ArrayList<HashMap<String, String>> find(String[] keys) throws IOException {
+    public static final int ORDER_BY_DESC = -1;
+    public static final int ORDER_BY_ASC = 1;
+
+    public ArrayList<HashMap<String, String>> find(String[] keys, String orderByField, int orderByDirection) throws IOException {
         ArrayList<HashMap<String, String>> documents = new ArrayList<>();
         String basePath = this.getBasePath();
         if ( keys == null ){
@@ -139,11 +141,17 @@ public class StorageService {
                 }
             }
         }
+        if ( orderByField != null && !orderByField.isEmpty() ){
+            documents.sort((a, b) -> {
+                int relation = a.get(orderByField).compareTo(b.get(orderByField));
+                return orderByDirection == StorageService.ORDER_BY_DESC ? -relation : relation;
+            });
+        }
         return documents;
     }
 
     public HashMap<String, String> findOne(String key) throws IOException {
-        ArrayList<HashMap<String, String>> results = this.find(new String[]{key});
+        ArrayList<HashMap<String, String>> results = this.find(new String[]{key}, null, 0);
         return results.size() == 0 ? null : results.get(0);
     }
 

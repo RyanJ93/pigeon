@@ -22,7 +22,7 @@ public class ReceivedMessage extends Message {
         ArrayList<ReceivedMessage> messages = new ArrayList<>();
         StorageService storageService = new StorageService();
         storageService.setNamespace("received_messages").setEntity(targetUser.getID());
-        ArrayList<HashMap<String, String>> documents = storageService.find(null);
+        ArrayList<HashMap<String, String>> documents = storageService.find(null, "date", StorageService.ORDER_BY_DESC);
         for ( HashMap<String, String> document : documents ){
             if ( !unreadOnly || document.get("read").equals("0") ){
                 ReceivedMessage receivedMessage = new ReceivedMessage();

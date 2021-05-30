@@ -4,21 +4,32 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<Pane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="418.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pigeon.controllers.LoginController">
    <children>
-      <Label layoutX="49.0" layoutY="14.0" text="Sign-in with your account">
+      <Label layoutX="79.0" layoutY="209.0" text="Sign-in with your account">
          <font>
-            <Font size="24.0" />
+            <Font size="18.0" />
          </font>
       </Label>
-      <Label layoutX="14.0" layoutY="85.0" text="Username" />
-      <TextField layoutX="14.0" layoutY="102.0" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="324.0" promptText="Username" />
-      <Label layoutX="15.0" layoutY="142.0" text="Password" />
-      <PasswordField layoutX="15.0" layoutY="159.0" prefHeight="27.0" prefWidth="324.0" promptText="Password" />
-      <Button layoutX="281.0" layoutY="259.0" mnemonicParsing="false" text="Sign-in" />
+      <Label layoutX="13.0" layoutY="254.0" text="Username" />
+      <TextField fx:id="username" layoutX="13.0" layoutY="271.0" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="324.0" promptText="Username" />
+      <Label layoutX="14.0" layoutY="311.0" text="Password" />
+      <PasswordField fx:id="password" layoutX="14.0" layoutY="328.0" prefHeight="27.0" prefWidth="324.0" promptText="Password" />
+      <Button layoutX="280.0" layoutY="377.0" mnemonicParsing="false" onAction="#handleSignInAction" text="Sign-in" />
+      <ImageView fitHeight="150.0" fitWidth="150.0" layoutX="100.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../assets/icon-150.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="130.0" layoutY="164.0" text="Pigeon">
+         <font>
+            <Font size="32.0" />
+         </font>
+      </Label>
    </children>
 </Pane>

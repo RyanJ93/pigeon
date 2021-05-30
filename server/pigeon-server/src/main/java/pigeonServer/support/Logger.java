@@ -1,5 +1,6 @@
 package pigeonServer.support;
 
+import pigeonServer.Main;
 import pigeonServer.models.Console;
 
 public class Logger {
@@ -14,7 +15,11 @@ public class Logger {
     }
 
     public static void log(String message){
-        Console.getActiveConsole().write(message);
+        if ( Main.isIsCLIMode() ){
+            System.out.println(message);
+        }else{
+            Console.getActiveConsole().write(message);
+        }
     }
 
     public static void logException(Throwable exception, boolean showOutput){

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="85.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="sender" layoutX="4.0" layoutY="6.0" prefHeight="18.0" prefWidth="151.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="date" layoutX="164.0" layoutY="7.0" prefHeight="17.0" prefWidth="124.0" textAlignment="RIGHT">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="subject" layoutX="6.0" layoutY="24.0" prefHeight="17.0" prefWidth="236.0" />
+      <Label fx:id="preview" alignment="TOP_LEFT" layoutX="5.0" layoutY="41.0" prefHeight="35.0" prefWidth="273.0" wrapText="true" />
+   </children>
+</Pane>

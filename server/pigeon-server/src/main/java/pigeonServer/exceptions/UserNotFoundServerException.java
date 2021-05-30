@@ -14,6 +14,6 @@ public class UserNotFoundServerException extends ServerException {
     }
 
     public int getResponseCode(){
-        return 400;
+        return 404;
     }
 }

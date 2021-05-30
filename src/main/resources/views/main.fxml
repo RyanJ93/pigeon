@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pigeon.controllers.MainController">
+   <children>
+      <MenuBar fx:id="menuBar" layoutY="1.0" prefHeight="27.0" prefWidth="1000.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleNewMessageAction" text="New message" />
+                  <MenuItem fx:id="replyMenuItem" mnemonicParsing="false" onAction="#handleReplyAction" text="Reply" />
+                  <MenuItem fx:id="replyAllMenuItem" mnemonicParsing="false" onAction="#handleReplyAllAction" text="Reply All" />
+                  <MenuItem fx:id="forwardMenuItem" mnemonicParsing="false" onAction="#handleForwardAction" text="Forward" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleLogoutAction" text="Logout" />
+              <MenuItem mnemonicParsing="false" onAction="#handleCloseAction" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+                  <MenuItem fx:id="markMenuItem" mnemonicParsing="false" onAction="#handleMarkAction" text="Mark as read" />
+                  <MenuItem fx:id="markAllMenuItem" mnemonicParsing="false" onAction="#handleMarkAllMessagesAsReadAction" text="Mark all messages as read" />
+              <MenuItem mnemonicParsing="false" onAction="#handleDeleteAction" text="Delete" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="View">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleShowReceivedAction" text="Show received" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleShowSentAction" text="Show sent" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleRefreshAction" text="Refresh" />
+              </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#handleAboutAction" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <SplitPane dividerPositions="0.29797979797979796" layoutY="28.0" prefHeight="574.0" prefWidth="1000.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="340.0">
+               <children>
+                  <ListView fx:id="messageList" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="572.0" prefWidth="300.0" />
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="755.0">
+               <children>
+                  <Label fx:id="messageSubject" layoutX="15.0" layoutY="38.0" prefHeight="17.0" prefWidth="527.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
+                  <Label fx:id="messageSender" layoutX="14.0" layoutY="14.0" prefHeight="23.0" prefWidth="403.0">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="messageDate" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="515.0" layoutY="17.0" prefHeight="17.0" prefWidth="169.0" textAlignment="RIGHT">
+                     <font>
+                        <Font name="System Italic" size="12.0" />
+                     </font>
+                  </Label>
+                  <WebView fx:id="messageBody" layoutX="13.0" layoutY="113.0" prefHeight="445.0" prefWidth="672.0" />
+                  <Label fx:id="messageRecipient" layoutX="15.0" layoutY="56.0">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                  </Label>
+               </children></AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>

@@ -8,12 +8,11 @@ import pigeonServer.exceptions.InvalidRequestServerException;
 import pigeonServer.exceptions.RequestParsingServerException;
 import pigeonServer.exceptions.ServerException;
 import pigeonServer.models.server.clientRequest.ClientRequest;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class ClientRequestHandler extends Thread {
     private final Socket incoming;
@@ -21,13 +20,8 @@ public class ClientRequestHandler extends Thread {
     private String requestData;
 
     private void loadClientRequest() throws IOException, InvalidRequestServerException {
-        InputStream inputStream = this.incoming.getInputStream();
-        Scanner scanner = new Scanner(inputStream);
-        StringBuilder stringBuilder = new StringBuilder();
-        while ( scanner.hasNextLine() ){
-            stringBuilder.append(scanner.nextLine()).append("\n");
-        }
-        this.requestData = stringBuilder.toString();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.incoming.getInputStream()));
+        this.requestData = new String(Base64.getDecoder().decode(bufferedReader.readLine()));
         if ( this.requestData.isEmpty() ){
             throw new InvalidRequestServerException("Empty request.");
         }
@@ -35,11 +29,11 @@ public class ClientRequestHandler extends Thread {
 
     private void sendResponse(HashMap<String, Object> response){
         try{
-            PrintWriter printWriter = new PrintWriter(this.incoming.getOutputStream(), true);
+            DataOutputStream dataOutputStream = new DataOutputStream(this.incoming.getOutputStream());
             GsonBuilder gsonBuilder = new GsonBuilder();
-            Gson gson = gsonBuilder.create();
-            printWriter.println(gson.toJson(response));
-            printWriter.close();
+            Gson gson = gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
+            String encodedData = Base64.getEncoder().encodeToString(gson.toJson(response).getBytes(StandardCharsets.UTF_8));
+            dataOutputStream.writeBytes(encodedData + '\n');
         }catch(IOException ex){
             ex.printStackTrace();
             Logger.log("Unable to send a response to client " + this.clientAddress);
@@ -111,7 +105,6 @@ public class ClientRequestHandler extends Thread {
     public ClientRequestHandler(Socket incoming){
         this.incoming = incoming;
         this.clientAddress = incoming.getInetAddress().getHostAddress();
-        Logger.log("Incoming request from client " + this.clientAddress);
         this.handle();
     }
 }

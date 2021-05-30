@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pigeon.controllers.AboutController">
+   <children>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="125.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../assets/icon-150.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="165.0" layoutY="164.0" text="Pigeon">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label alignment="TOP_LEFT" contentDisplay="TOP" layoutX="13.0" layoutY="201.0" prefHeight="35.0" prefWidth="374.0" text="A simple email-like  messagging app written from scratch in Java and JavaFX for accademical purposes." wrapText="true" />
+      <Label layoutX="14.0" layoutY="236.0" prefHeight="17.0" prefWidth="374.0" text="Developed with ❤️ by Enrico Sola (www.enricosola.com)." />
+      <Label fx:id="version" alignment="CENTER" contentDisplay="CENTER" layoutX="9.0" layoutY="262.0" prefHeight="17.0" prefWidth="374.0" textAlignment="CENTER" />
+   </children>
+</Pane>

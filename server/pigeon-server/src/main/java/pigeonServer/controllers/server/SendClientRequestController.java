@@ -1,9 +1,11 @@
 package pigeonServer.controllers.server;
 
 import pigeonServer.exceptions.ControllerServerException;
+import pigeonServer.models.server.SentMessage;
 import pigeonServer.models.server.clientRequest.SendClientRequest;
 import pigeonServer.services.MessageService;
 import pigeonServer.support.Logger;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SendClientRequestController extends ClientRequestController {
@@ -23,9 +25,14 @@ public class SendClientRequestController extends ClientRequestController {
             SendClientRequest sendClientRequest = (SendClientRequest)this.clientRequest;
             MessageService messageService = new MessageService();
             messageService.setUser(sendClientRequest.getAuthenticatedUser());
-            messageService.send(sendClientRequest.getRecipients(), sendClientRequest.getSubject(), sendClientRequest.getBody());
+            ArrayList<String> recipients = sendClientRequest.getRecipients();
+            String subject = sendClientRequest.getSubject();
+            String body = sendClientRequest.getBody();
+            SentMessage sentMessage = messageService.send(recipients, subject, body);
+            HashMap<String, Object> response = new HashMap<>();
+            response.put("message", sentMessage);
             this.logAction();
-            return null;
+            return response;
         }catch(Exception ex){
             throw new ControllerServerException("An error occurred while processing the request.", ex);
         }

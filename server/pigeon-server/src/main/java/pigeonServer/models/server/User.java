@@ -8,13 +8,31 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class User implements Serializable {
+    public static final String SYSTEM_USER_UUID = "00000000-0000-0000-0000-000000000000";
+    public static final String SYSTEM_USER_USERNAME = "system";
+
+    private static User systemUser;
+
     private static String generatePasswordHash(String password) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
         messageDigest.update(StandardCharsets.UTF_8.encode(password));
         return String.format("%032x", new BigInteger(1, messageDigest.digest()));
+    }
+
+    public static User getSystemUser(){
+        if ( User.systemUser == null ){
+            User.systemUser = new User();
+            User.systemUser.setProperties(new HashMap<>(Map.of(
+                "id", User.SYSTEM_USER_UUID,
+                "username", User.SYSTEM_USER_USERNAME,
+                "password", ""
+            )));
+        }
+        return User.systemUser;
     }
 
     public static User find(String id) throws IOException {
@@ -24,6 +42,8 @@ public class User implements Serializable {
         if ( document != null ){
             user = new User();
             user.setProperties(document);
+        }else if ( id.equals(User.SYSTEM_USER_UUID) ){
+            user = User.getSystemUser();
         }
         return user;
     }
@@ -35,6 +55,8 @@ public class User implements Serializable {
         if ( document != null ){
             user = new User();
             user.setProperties(document);
+        }else if ( username.equals(User.SYSTEM_USER_USERNAME) ){
+            user = User.getSystemUser();
         }
         return user;
     }

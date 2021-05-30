@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.pigeonServer'
-version '1.0-SNAPSHOT'
+version '0.0.1'
 
 repositories {
     mavenCentral()
@@ -13,28 +13,28 @@ repositories {
 
 sourceCompatibility = 15
 targetCompatibility = 15
-mainClassName = 'pigeonServer.Main'
+mainClassName = 'pigeonServer.Launcher'
 
 application {
-    mainClassName = 'pigeonServer.Main'
+    mainClassName = 'pigeonServer.Launcher'
 }
 
 javafx {
-    version = "14"
+    version = "16"
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'io.sentry:sentry:4.3.0'
 }
 
 jar {
     manifest {
-        attributes 'Main-Class': 'com.pigeonServer.Main'
+        attributes 'Main-Class': 'pigeonServer.Launcher'
     }
-}
-
-task useradd(type:JavaExec) {
-    main = 'pigeonServer.bin.UserAdd'
-    classpath = sourceSets.main.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
