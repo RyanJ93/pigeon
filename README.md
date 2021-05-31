@@ -67,6 +67,7 @@ Similarly, you can change user passwords using the `change-password` option, usa
 java -jar pigeon-server.jar --change-password "username" "new password"
 ```
 
+This option's Docker counterpart is the command `pigeon_change_password`.<br />
 User deletion has not been implemented yet.
 
 ### Sentry support
