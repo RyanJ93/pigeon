@@ -37,7 +37,7 @@ You can build and then run a Docker image out of this project: all you need is t
 You may want to change the storage directory when running as a Docker container, to do that simply mount your directory as a volume, here's an example:
 
 ```bash
-docker run -v /path/to/storage/dir:/storage -d --name pigeon-server enricosola/pigeon-server:latest
+docker run -p 2898:2898 -v /path/to/storage/dir:/storage -d --name pigeon-server enricosola/pigeon-server:latest
 ```
 
 ### Creating users
@@ -59,12 +59,22 @@ If you are running the server as a Docker container you can add new users using 
 docker exec pigeon-server pigeon_useradd "username" "password"
 ````
 
+### Changing user password
+
+Similarly, you can change user passwords using the `change-password` option, usage is the following:
+
+```bash
+java -jar pigeon-server.jar --change-password "username" "new password"
+```
+
+User deletion has not been implemented yet.
+
 ### Sentry support
 The Pigeon server supports the Sentry error tracking platform: all you need to integrate the server with Sentry is your project DSN, declare an environment variable called `PIGEON_SENTRY_DSN` containing your DSN and then start the server.<br />
 If your running the server as a Docker container you may set the environment variable as docker run parameter, here's an example:
 
 ```bash
-docker run -e PIGEON_SENTRY_DSN="YOUR SENTRY DSN HERE" -d --name pigeon-server enricosola/pigeon-server:latest
+docker run -p 2898:2898 -e PIGEON_SENTRY_DSN="YOUR SENTRY DSN HERE" -d --name pigeon-server enricosola/pigeon-server:latest
 ```
 
 ### Data storage

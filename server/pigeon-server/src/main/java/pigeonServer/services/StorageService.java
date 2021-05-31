@@ -11,7 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-public class StorageService {
+public class StorageService extends Service {
     public static final String STORAGE_DIRECTORY_PATH = "storage/";
 
     private static String generateKeyHash(String key){

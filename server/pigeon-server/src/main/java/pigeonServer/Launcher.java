@@ -2,8 +2,8 @@ package pigeonServer;
 
 import javafx.application.Application;
 import pigeonServer.models.server.User;
-import pigeonServer.services.MessageService;
 import io.sentry.Sentry;
+import pigeonServer.services.NotificationService;
 
 public class Launcher {
     private static void handleUserAddMode(String[] args){
@@ -22,9 +22,32 @@ public class Launcher {
             }
             User user = new User();
             user.setUsername(args[1]).setPassword(args[2]).save();
-            MessageService messageService = new MessageService();
-            messageService.setUser(user).sendWelcomeMessage();
+            NotificationService notificationService = new NotificationService();
+            notificationService.setUser(user).sendWelcomeNotification();
             System.out.println("Registered user with ID " + user.getID());
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private static void handleChangePasswordMode(String[] args){
+        try{
+            if ( args.length < 2 || args[1].isEmpty() ){
+                System.out.println("No such user found.");
+                System.exit(1);
+            }
+            if ( args.length < 3 || args[2].isEmpty() ){
+                System.out.println("Invalid password.");
+                System.exit(1);
+            }
+            User user = User.findByUsername(args[1]);
+            if ( user == null ){
+                System.out.println("No such user found.");
+            }
+            user.setPassword(args[2]).save();
+            NotificationService notificationService = new NotificationService();
+            notificationService.setUser(user).sendPasswordChangedNotification();
+            System.out.println("Password changed!");
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -41,15 +64,26 @@ public class Launcher {
     }
 
     public static void main(String[] args){
+
+        try{
+            NotificationService notificationService = new NotificationService();
+            notificationService.setUser(User.findByUsername("test2")).sendWelcomeNotification();
+        }catch (Exception ignored){}
+
         Launcher.setupSentry();
         if ( args.length > 0 && args[0].equals("--useradd") ){
             Launcher.handleUserAddMode(args);
+        }else if ( args.length > 0 && args[0].equals("--change-password") ){
+            Launcher.handleChangePasswordMode(args);
         }else{
             Main.setupOptions(args);
             if ( Main.isIsCLIMode() ){
                 Main.startNoGui();
             }else{
                 Application.launch(Main.class, args);
+
+
+
             }
         }
     }

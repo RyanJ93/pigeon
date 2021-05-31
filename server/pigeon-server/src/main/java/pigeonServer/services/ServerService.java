@@ -2,7 +2,7 @@ package pigeonServer.services;
 
 import pigeonServer.support.Server;
 
-public class ServerService {
+public class ServerService extends Service {
     Server server = null;
 
     public ServerService start(){

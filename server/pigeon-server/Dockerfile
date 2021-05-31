@@ -9,4 +9,6 @@ RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /app/pigeon-server.jar
 RUN printf "#!/bin/bash\njava -jar /app/pigeon-server.jar --useradd \"\$@\"" > /bin/pigeon_useradd
 RUN chmod +x /bin/pigeon_useradd
+RUN printf "#!/bin/bash\njava -jar /app/pigeon-server.jar --change-password \"\$@\"" > /bin/pigeon_change_password
+RUN chmod +x /bin/pigeon_change_password
 ENTRYPOINT ["java", "-jar", "/app/pigeon-server.jar", "--no-gui"]

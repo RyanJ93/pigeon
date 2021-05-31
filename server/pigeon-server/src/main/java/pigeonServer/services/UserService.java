@@ -8,7 +8,7 @@ import pigeonServer.support.Logger;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-public class UserService {
+public class UserService extends Service {
     public AuthToken authenticateByCredentials(String username, String password) throws UserNotFoundServerException, UnauthorizedServerException, NoSuchAlgorithmException, IOException {
         User user = User.findByUsername(username);
         if ( user == null ){

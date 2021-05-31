@@ -119,9 +119,14 @@ public class User implements Serializable {
     public User save() throws IOException, NoSuchAlgorithmException {
         HashMap<String, String> properties = this.getProperties();
         StorageService storageService = new StorageService();
-        storageService.setEntity("users").insert(this.id, properties);
-        storageService.setEntity("users_by_username").insert(this.username, properties);
-        this.bound = true;
+        if ( this.bound ){
+            storageService.setEntity("users").update(this.id, properties, true);
+            storageService.setEntity("users_by_username").update(this.username, properties, true);
+        }else{
+            storageService.setEntity("users").insert(this.id, properties);
+            storageService.setEntity("users_by_username").insert(this.username, properties);
+            this.bound = true;
+        }
         return this;
     }
 
