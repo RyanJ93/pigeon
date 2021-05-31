@@ -45,16 +45,16 @@
           </Menu>
         </menus>
       </MenuBar>
-      <SplitPane dividerPositions="0.29797979797979796" layoutY="28.0" prefHeight="574.0" prefWidth="1000.0">
+      <SplitPane dividerPositions="0.3226452905811623" layoutY="28.0" prefHeight="574.0" prefWidth="1000.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="340.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="360.0" SplitPane.resizableWithParent="false">
                <children>
-                  <ListView fx:id="messageList" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="572.0" prefWidth="300.0" />
+                  <ListView fx:id="messageList" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="572.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" />
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="755.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="740.0" SplitPane.resizableWithParent="false">
                <children>
-                  <Label fx:id="messageSubject" layoutX="15.0" layoutY="38.0" prefHeight="17.0" prefWidth="527.0">
+                  <Label fx:id="messageSubject" layoutX="15.0" layoutY="38.0" prefHeight="18.0" prefWidth="649.0">
                      <font>
                         <Font size="14.0" />
                      </font></Label>
@@ -63,12 +63,12 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
-                  <Label fx:id="messageDate" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="515.0" layoutY="17.0" prefHeight="17.0" prefWidth="169.0" textAlignment="RIGHT">
+                  <Label fx:id="messageDate" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="493.0" layoutY="17.0" prefHeight="17.0" prefWidth="169.0" textAlignment="RIGHT">
                      <font>
                         <Font name="System Italic" size="12.0" />
                      </font>
                   </Label>
-                  <WebView fx:id="messageBody" layoutX="13.0" layoutY="113.0" prefHeight="445.0" prefWidth="672.0" />
+                  <WebView fx:id="messageBody" layoutX="13.0" layoutY="113.0" prefHeight="445.0" prefWidth="649.0" />
                   <Label fx:id="messageRecipient" layoutX="15.0" layoutY="56.0">
                      <font>
                         <Font size="11.0" />

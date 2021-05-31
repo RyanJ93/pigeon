@@ -8,15 +8,15 @@
    <children>
       <Label fx:id="sender" layoutX="4.0" layoutY="6.0" prefHeight="18.0" prefWidth="151.0">
          <font>
-            <Font name="System Bold" size="14.0" />
+            <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label fx:id="date" layoutX="164.0" layoutY="7.0" prefHeight="17.0" prefWidth="124.0" textAlignment="RIGHT">
+      <Label fx:id="date" alignment="CENTER_RIGHT" layoutX="174.0" layoutY="6.0" prefHeight="17.0" prefWidth="115.0" textAlignment="RIGHT">
          <font>
             <Font name="System Bold Italic" size="12.0" />
          </font>
       </Label>
-      <Label fx:id="subject" layoutX="6.0" layoutY="24.0" prefHeight="17.0" prefWidth="236.0" />
-      <Label fx:id="preview" alignment="TOP_LEFT" layoutX="5.0" layoutY="41.0" prefHeight="35.0" prefWidth="273.0" wrapText="true" />
+      <Label fx:id="subject" layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="284.0" />
+      <Label fx:id="preview" alignment="TOP_LEFT" layoutX="5.0" layoutY="45.0" prefHeight="35.0" prefWidth="284.0" wrapText="true" />
    </children>
 </Pane>

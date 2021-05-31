@@ -39,7 +39,7 @@ public class MessageCardController extends ListCell<Message> implements Initiali
         if ( this.message != null ){
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            String sender = this.message.getSender().getUsername() + "@" + Connector.getHostname();
+            String sender = this.message.getSender().getUsername();
             if ( !this.message.getSent() && !this.message.getRead() ){
                 sender = "• " + sender;
             }

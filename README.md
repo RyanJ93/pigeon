@@ -5,7 +5,7 @@ It allows you to exchange messages in the same fashion you are used to with regu
 
 ## Building the client
 
-The project's dependencies and building strategy is managed by Gradle, a Gradle wrapper is included too.<br />
+The project's dependencies and building strategy is managed by Gradle, however you may need to set up the Gradle wrapper, you can set up the wrapper using the command `gradle wrapper` directly in the project root directory.<br />
 You can run the application invoking the task "run", for instance:
 
 ```bash
@@ -79,7 +79,12 @@ docker run -p 2898:2898 -e PIGEON_SENTRY_DSN="YOUR SENTRY DSN HERE" -d --name pi
 ```
 
 ### Data storage
+
 Server stores its data under "storage" directory, you may set your own directory when running the server as a Docker image,
+
+## Requirements
+
+To run and work with this project you need to have Java version 15 or greater installed on your machine, additionally Gradle version 7 is required as well.
 
 ## Other considerations
 
