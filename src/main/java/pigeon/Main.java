@@ -20,6 +20,7 @@ import java.awt.desktop.AboutEvent;
 import java.awt.desktop.AboutHandler;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Objects;
 
 public class Main extends Application {
@@ -60,9 +61,12 @@ public class Main extends Application {
     }
 
     private void setup(){
-        Desktop.getDesktop().setAboutHandler(e -> {
-            AboutController.show();
-        });
+        final String os = System.getProperty("os.name");
+        if ( os != null && os.toLowerCase(Locale.ROOT).startsWith("mac") ){
+            Desktop.getDesktop().setAboutHandler(e -> {
+                AboutController.show();
+            });
+        }
     }
 
     @Override
