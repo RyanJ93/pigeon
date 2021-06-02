@@ -12,10 +12,10 @@ You can run the application invoking the task "run", for instance:
 ./gradlew run
 ```
 
-Or on Windows (PowerShell):
+Or on Windows:
 
-```powershell
-.\gradlew run
+```cmd
+gradlew.bat run
 ```
 
 Similarly, you can build a "fatjar" invoking the "jar" task.
@@ -26,7 +26,7 @@ When logging in you must provide both the username and the hostname where you ar
 
 ## Building the server
 
-Pigeon server is located under server/pigeon-server.<br />
+Pigeon server is located under `server/pigeon-server`.<br />
 Like the main application, Gradle has been used to handle server's dependencies as well.<br />
 You can run the server, again, invoking the task "run" and in the same way you can build a "fatjar" invoking the "jar" task.<br />
 Server will listen on port 2898, so you may need to adjust your firewall settings to allow clients to connect through that port.<br />
@@ -71,6 +71,7 @@ This option's Docker counterpart is the command `pigeon_change_password`.<br />
 User deletion has not been implemented yet.
 
 ### Sentry support
+
 The Pigeon server supports the Sentry error tracking platform: all you need to integrate the server with Sentry is your project DSN, declare an environment variable called `PIGEON_SENTRY_DSN` containing your DSN and then start the server.<br />
 If your running the server as a Docker container you may set the environment variable as docker run parameter, here's an example:
 
