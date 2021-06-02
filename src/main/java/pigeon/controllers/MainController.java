@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import pigeon.Main;
@@ -38,7 +39,10 @@ public class MainController extends Controller implements Initializable {
                 MainController.stage = new Stage();
                 MainController.stage.setTitle("Pigeon");
                 MainController.stage.setScene(new Scene(root, 1000, 600));
-                MainController.stage.setOnCloseRequest(event -> Platform.exit());
+                MainController.stage.setOnCloseRequest(event -> {
+                    Platform.exit();
+                    System.exit(0);
+                });
                 MainController.stage.setResizable(false);
             }
             MainController.stage.toFront();
@@ -101,6 +105,12 @@ public class MainController extends Controller implements Initializable {
     @FXML
     private MenuItem forwardMenuItem;
 
+    @FXML
+    private MenuItem changeListMenuItem;
+
+    @FXML
+    private AnchorPane messageViewer;
+
     private Message selectedMessage = null;
     private boolean isSentList = false;
 
@@ -112,6 +122,7 @@ public class MainController extends Controller implements Initializable {
     @FXML
     private void handleCloseAction(){
         Platform.exit();
+        System.exit(0);
     }
 
     @FXML
@@ -140,14 +151,8 @@ public class MainController extends Controller implements Initializable {
     }
 
     @FXML
-    private void handleShowReceivedAction(){
-        this.isSentList = false;
-        this.reloadList();
-    }
-
-    @FXML
-    private void handleShowSentAction(){
-        this.isSentList = true;
+    private void handleChangeListAction(){
+        this.isSentList = !this.isSentList;
         this.reloadList();
     }
 
@@ -222,30 +227,31 @@ public class MainController extends Controller implements Initializable {
     }
 
     private void resetMessageViewer(){
+        this.messageBody.getEngine().loadContent("");
+        this.messageRecipient.setText("");
+        this.messageSubject.setText("");
         this.messageSender.setText("");
         this.messageDate.setText("");
-        this.messageSubject.setText("");
-        this.messageBody.getEngine().loadContent("");
     }
 
     private void displayMessage(Message message){
-        if ( message == null ){
-            this.resetMessageViewer();
-            return;
-        }
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        this.messageSender.setText(message.getSender().getUsername() + "@" + Connector.getHostname());
-        this.messageDate.setText(dateFormat.format(message.getDate()));
-        this.messageSubject.setText(message.getSubject());
-        ArrayList<String> recipientList = new ArrayList<>();
-        message.getRecipients().forEach(user -> recipientList.add(user.getUsername() + "@" + Connector.getHostname()));
-        this.messageRecipient.setText("To: " + String.join(", ", recipientList));
-        this.messageBody.getEngine().loadContent(message.getBody());
+        this.messageViewer.setVisible(message != null);
         this.selectedMessage = message;
-        this.markMenuItem.setText(message.getRead() && !message.getSent() ? "Mark as unread" : "Mark as read");
-        if ( !message.getRead() && !message.getSent() ){
-            this.markSelectedMessage();
+        this.resetMessageViewer();
+        if ( message != null ){
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            this.messageSender.setText(message.getSender().getUsername() + "@" + Connector.getHostname());
+            this.messageDate.setText(dateFormat.format(message.getDate()));
+            this.messageSubject.setText(message.getSubject());
+            ArrayList<String> recipientList = new ArrayList<>();
+            message.getRecipients().forEach(user -> recipientList.add(user.getUsername() + "@" + Connector.getHostname()));
+            this.messageRecipient.setText("To: " + String.join(", ", recipientList));
+            this.messageBody.getEngine().loadContent(message.getBody());
+            this.markMenuItem.setText(message.getRead() && !message.getSent() ? "Mark as unread" : "Mark as read");
+            if ( !message.getRead() && !message.getSent() ){
+                this.markSelectedMessage();
+            }
         }
     }
 
@@ -268,17 +274,23 @@ public class MainController extends Controller implements Initializable {
     private void reloadList(){
         try{
             this.refreshMenuItemsDisableStatus();
+            this.messageViewer.setVisible(false);
+            this.resetMessageViewer();
             if ( this.isSentList ){
                 MessageList messageList = MessageList.getList(MessageList.MODE_SENT);
                 this.messageList.setItems(messageList.getMessageObservableList());
+                this.changeListMenuItem.setText("Show received messages");
                 messageList.reload();
             }else{
                 MessageList messageList = MessageList.getList(MessageList.MODE_RECEIVED);
                 this.messageList.setItems(messageList.getMessageObservableList());
+                this.changeListMenuItem.setText("Show sent messages");
                 messageList.reload().setupListener();
             }
-            if ( this.messageList.getItems().size() > 0 ){
-                this.displayMessage(this.messageList.getItems().get(0));
+            boolean isEmptyList = this.messageList.getItems().size() == 0;
+            this.displayMessage(isEmptyList ? null : this.messageList.getItems().get(0));
+            if ( isEmptyList ){
+                this.messageList.setPlaceholder(new Label("No message found"));
             }
         }catch(UnauthorizedException | UserNotFoundException ex){
             Main.requestLogin();

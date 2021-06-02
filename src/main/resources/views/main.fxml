@@ -21,7 +21,7 @@
                   <MenuItem fx:id="replyAllMenuItem" mnemonicParsing="false" onAction="#handleReplyAllAction" text="Reply All" />
                   <MenuItem fx:id="forwardMenuItem" mnemonicParsing="false" onAction="#handleForwardAction" text="Forward" />
                   <MenuItem mnemonicParsing="false" onAction="#handleLogoutAction" text="Logout" />
-              <MenuItem mnemonicParsing="false" onAction="#handleCloseAction" text="Close" />
+              <MenuItem mnemonicParsing="false" onAction="#handleCloseAction" text="Exit" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
@@ -33,8 +33,7 @@
           </Menu>
             <Menu mnemonicParsing="false" text="View">
               <items>
-                <MenuItem mnemonicParsing="false" onAction="#handleShowReceivedAction" text="Show received" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleShowSentAction" text="Show sent" />
+                <MenuItem fx:id="changeListMenuItem" mnemonicParsing="false" onAction="#handleChangeListAction" text="Show sent messages" />
                   <MenuItem mnemonicParsing="false" onAction="#handleRefreshAction" text="Refresh" />
               </items>
             </Menu>
@@ -52,12 +51,13 @@
                   <ListView fx:id="messageList" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="572.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" />
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="740.0" SplitPane.resizableWithParent="false">
+          <AnchorPane fx:id="messageViewer" minHeight="0.0" minWidth="0.0" prefHeight="572.0" prefWidth="740.0" SplitPane.resizableWithParent="false">
                <children>
                   <Label fx:id="messageSubject" layoutX="15.0" layoutY="38.0" prefHeight="18.0" prefWidth="649.0">
                      <font>
                         <Font size="14.0" />
-                     </font></Label>
+                     </font>
+                  </Label>
                   <Label fx:id="messageSender" layoutX="14.0" layoutY="14.0" prefHeight="23.0" prefWidth="403.0">
                      <font>
                         <Font name="System Bold" size="18.0" />

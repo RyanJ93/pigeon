@@ -132,7 +132,7 @@ public class EditorController extends Controller implements Initializable {
 
     private void handleMessageReply(boolean all) throws IOException, Exception {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
-        String recipients = this.contextMessage.getSender().getUsername();
+        String recipients = this.contextMessage.getSender().getUsername() + "@" + Connector.getHostname();
         UserService userService = new UserService();
         User loggedInUser = userService.getActiveUser();
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
