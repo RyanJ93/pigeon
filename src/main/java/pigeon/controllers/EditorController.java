@@ -139,11 +139,13 @@ public class EditorController extends Controller implements Initializable {
         if ( all ){
             ArrayList<String> recipientList = new ArrayList<>();
             this.contextMessage.getRecipients().forEach(user -> {
-                if ( user.getID().equals(loggedInUser.getID()) ){
+                if ( !user.getID().equals(loggedInUser.getID()) ){
                     recipientList.add(user.getUsername() + "@" + Connector.getHostname());
                 }
             });
-            recipients += ", " + String.join(", ", recipientList);
+            if ( recipientList.size() > 0 ){
+                recipients += ", " + String.join(", ", recipientList);
+            }
         }
         String HTMLBody = "<br /><br /><div style=\"border-left:3px solid #9b59b6;padding-left:6px;color:9b59b6;\">";
         HTMLBody += "<p style=\"margin:0;\">On " + dateFormat.format(this.contextMessage.getDate()) + " ";
@@ -162,7 +164,7 @@ public class EditorController extends Controller implements Initializable {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
         ArrayList<String> recipientList = new ArrayList<>();
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        this.contextMessage.getRecipients().forEach(user -> recipientList.add(user.getUsername()));
+        this.contextMessage.getRecipients().forEach(user -> recipientList.add(user.getUsername() + "@" + Connector.getHostname()));
         String HTMLBody = "<br /><br /><div style=\"border-left:3px solid #9b59b6;padding-left:6px;color:9b59b6;\">";
         HTMLBody += "<p style=\"margin:0;\">Begin forwarded message: </p><br />";
         HTMLBody += "<p style=\"margin:0;\"><b>From:</b> " + this.contextMessage.getSender().getUsername() + "</p>";
@@ -176,6 +178,7 @@ public class EditorController extends Controller implements Initializable {
         }
         this.body.setHtmlText(HTMLBody);
         this.subject.setText(subject);
+        this.recipients.setText("");
     }
 
     private void handleContextMessage(){
