@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -16,10 +17,13 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
+                  <MenuItem fx:id="loggedUserMenuItem" disable="true" mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#handleNewMessageAction" text="New message" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="replyMenuItem" mnemonicParsing="false" onAction="#handleReplyAction" text="Reply" />
                   <MenuItem fx:id="replyAllMenuItem" mnemonicParsing="false" onAction="#handleReplyAllAction" text="Reply All" />
                   <MenuItem fx:id="forwardMenuItem" mnemonicParsing="false" onAction="#handleForwardAction" text="Forward" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#handleLogoutAction" text="Logout" />
               <MenuItem mnemonicParsing="false" onAction="#handleCloseAction" text="Exit" />
             </items>
@@ -28,6 +32,7 @@
             <items>
                   <MenuItem fx:id="markMenuItem" mnemonicParsing="false" onAction="#handleMarkAction" text="Mark as read" />
                   <MenuItem fx:id="markAllMenuItem" mnemonicParsing="false" onAction="#handleMarkAllMessagesAsReadAction" text="Mark all messages as read" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" onAction="#handleDeleteAction" text="Delete" />
             </items>
           </Menu>

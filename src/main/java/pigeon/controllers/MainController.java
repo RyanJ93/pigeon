@@ -16,6 +16,7 @@ import pigeon.exceptions.Exception;
 import pigeon.exceptions.UnauthorizedException;
 import pigeon.exceptions.UserNotFoundException;
 import pigeon.models.Message;
+import pigeon.models.User;
 import pigeon.services.UserService;
 import pigeon.support.Connector;
 import pigeon.support.MessageList;
@@ -107,6 +108,9 @@ public class MainController extends Controller implements Initializable {
 
     @FXML
     private MenuItem changeListMenuItem;
+
+    @FXML
+    private MenuItem loggedUserMenuItem;
 
     @FXML
     private AnchorPane messageViewer;
@@ -392,7 +396,14 @@ public class MainController extends Controller implements Initializable {
         this.messageList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             this.displayMessage(observable.getValue());
         });
-        this.messageList.setCellFactory(messageCardController -> new MessageCardController());
+        try{
+            this.messageList.setCellFactory(messageCardController -> new MessageCardController());
+            UserService userService = new UserService();
+            User loggedInUser = userService.getActiveUser();
+            this.loggedUserMenuItem.setText("Logged in as " + loggedInUser.getUsername() + "@" + Connector.getHostname());
+        }catch(Exception | IOException ex){
+            ex.printStackTrace();
+        }
         this.reloadList();
         return this;
     }
