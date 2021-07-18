@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 import pigeonServer.services.ServerService;
 import pigeonServer.support.Logger;
 import java.net.URL;
@@ -35,6 +36,10 @@ public class Main extends Application {
             Parent root = FXMLLoader.load(Objects.requireNonNull(url));
             primaryStage.setTitle("Pigeon server console");
             primaryStage.setScene(new Scene(root, 900, 500));
+            primaryStage.setOnCloseRequest(event -> {
+                Platform.exit();
+                System.exit(0);
+            });
             primaryStage.setResizable(false);
             primaryStage.show();
         }

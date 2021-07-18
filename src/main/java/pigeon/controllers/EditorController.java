@@ -19,13 +19,14 @@ import pigeon.models.User;
 import pigeon.services.UserService;
 import pigeon.support.Connector;
 import pigeon.support.MessageList;
-import pigeon.util.MessageUtils;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EditorController extends Controller implements Initializable {
     public static final int REPLY_MODE = 1;
@@ -95,10 +96,56 @@ public class EditorController extends Controller implements Initializable {
         this.subject.setText("");
     }
 
+    private ArrayList<String> getRecipients(boolean usernameOnly){
+        String recipientListText = this.recipients.getText();
+        ArrayList<String> recipients = new ArrayList<>();
+        if ( recipientListText != null && !recipientListText.isEmpty() ){
+            if ( usernameOnly ){
+                String[] candidateList = recipientListText.split(",");
+                ArrayList<String> recipientList = new ArrayList<>();
+                for ( String candidate : candidateList ){
+                    String[] components = candidate.trim().split("@");
+                    if ( components.length == 2 && !recipientList.contains(components[0]) ){
+                        recipientList.add(components[0]);
+                    }
+                }
+                recipients = recipientList;
+            }else{
+                recipients = new ArrayList<>(Arrays.asList(recipientListText.split(",")));
+            }
+        }
+        return recipients;
+    }
+
     private boolean validate(){
+        Pattern usernamePattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,31}$");
+        Pattern hostnamePattern = Pattern.compile("^[a-zA-Z0-9._-]+\\.[a-zA-Z0-9]+$");
+        ArrayList<String> invalidRecipientList = new ArrayList<>();
+        ArrayList<String> recipients = this.getRecipients(false);
         String messages = "";
-        if ( MessageUtils.getRecipientsFromString(this.recipients.getText()).size() == 0 ){
+        for ( String recipient : recipients ){
+            recipient = recipient.trim();
+            String[] components = recipient.split("@");
+            if ( components.length != 2 ){
+                if ( !invalidRecipientList.contains(recipient) ){
+                    invalidRecipientList.add(recipient);
+                }
+                continue;
+            }
+            Matcher usernameMatcher = usernamePattern.matcher(components[0]);
+            Matcher hostnameMatcher = hostnamePattern.matcher(components[1]);
+            boolean isValid = usernameMatcher.matches() && hostnameMatcher.matches() && !components[0].equalsIgnoreCase("system");
+            if ( !isValid && !invalidRecipientList.contains(recipient) ){
+                invalidRecipientList.add(recipient);
+            }
+        }
+        if ( recipients.size() == 0 ){
             messages += "You must provide at least one recipient.\n";
+        }else if ( invalidRecipientList.size() > 0 ){
+            messages += "The following addresses are not valid:\n";
+            for ( String invalidRecipient : invalidRecipientList ){
+                messages += invalidRecipient + "\n";
+            }
         }
         if ( !messages.isEmpty() ){
             EditorController.makeAlert("Invalid message", messages.trim()).show();
@@ -109,7 +156,7 @@ public class EditorController extends Controller implements Initializable {
     private void sendMessage(){
         if ( this.validate() && EditorController.checkOnlineStatus() ){
             this.sendButton.setDisable(true);
-            ArrayList<String> recipients = MessageUtils.getRecipientsFromString(this.recipients.getText());
+            ArrayList<String> recipients = this.getRecipients(true);
             String subject = this.subject.getText();
             String body = this.body.getHtmlText();
             new Thread(() -> {

@@ -12,6 +12,6 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <TextArea fx:id="consoleOutput" disable="true" editable="false" layoutX="11.0" layoutY="54.0" prefHeight="436.0" prefWidth="879.0" wrapText="true" />
+      <TextArea fx:id="consoleOutput" editable="false" layoutX="11.0" layoutY="54.0" prefHeight="436.0" prefWidth="879.0" wrapText="true" />
    </children>
 </Pane>

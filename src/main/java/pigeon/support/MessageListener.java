@@ -14,7 +14,7 @@ import java.util.Date;
 public class MessageListener extends Thread {
     private static final int MESSAGE_FETCH_INTERVAL = 3000;
 
-    private static boolean isOnline = false;
+    private static boolean isOnline = true;
 
     public static synchronized boolean isOnline(){
         return MessageListener.isOnline;

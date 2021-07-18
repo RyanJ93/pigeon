@@ -4,11 +4,18 @@ import javafx.application.Application;
 import pigeonServer.models.server.User;
 import io.sentry.Sentry;
 import pigeonServer.services.NotificationService;
+import java.util.regex.*;
 
 public class Launcher {
+    private static boolean validateUsername(String username){
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,31}$");
+        Matcher matcher = pattern.matcher(username);
+        return matcher.matches();
+    }
+
     private static void handleUserAddMode(String[] args){
         try{
-            if ( args.length < 2 || args[1].isEmpty() ){
+            if ( args.length < 2 || args[1].isEmpty() || !Launcher.validateUsername(args[1]) ){
                 System.out.println("Invalid username.");
                 System.exit(1);
             }
