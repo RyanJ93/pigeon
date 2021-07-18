@@ -46,7 +46,7 @@ public class Main extends Application {
     }
 
     public static void notifyNewMessages(int count){
-        Platform.runLater(() -> {System.out.println("NEW MESSAGE");
+        Platform.runLater(() -> {
             URL url = Objects.requireNonNull(Main.class.getClassLoader().getResource("assets/notification.wav"));
             String content = "You have received " + count + " new message" + ( count == 1 ? "." : "s." );
             Alert alert = new Alert(Alert.AlertType.INFORMATION);

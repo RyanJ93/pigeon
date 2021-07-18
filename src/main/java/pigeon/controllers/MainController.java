@@ -290,7 +290,7 @@ public class MainController extends Controller implements Initializable {
                 MessageList messageList = MessageList.getList(MessageList.MODE_RECEIVED);
                 this.messageList.setItems(messageList.getMessageObservableList());
                 this.changeListMenuItem.setText("Show sent messages");
-                messageList.setupListener().reload();
+                messageList.reload().setupListener();
             }
             this.displayMessage(this.messageList.getItems().isEmpty() ? null : this.messageList.getItems().get(0));
             if ( this.messageList.getItems().isEmpty() ){

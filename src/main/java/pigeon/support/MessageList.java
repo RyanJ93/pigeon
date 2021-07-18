@@ -59,8 +59,8 @@ public class MessageList {
 
     public synchronized boolean addMessage(Message message){
         AtomicBoolean inserted = new AtomicBoolean(false);
+        inserted.set(!this.messageIndex.contains(message.getID()));
         Platform.runLater(() -> {
-            inserted.set(!this.messageIndex.contains(message.getID()));
             if ( inserted.get() ){
                 this.messageObservableList.add(0, message);
             }

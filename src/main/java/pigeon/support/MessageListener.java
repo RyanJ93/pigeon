@@ -23,7 +23,7 @@ public class MessageListener extends Thread {
     private final MessageList messageList;
     private Date lastFetchDate;
 
-    private void fetchNewMessages() throws IOException, Exception {
+    private void fetchNewMessages(boolean announceNewMessages) throws IOException, Exception {
         ArrayList<Message> messages = Message.getReceived(this.lastFetchDate, true);
         if ( messages != null ){
             int count = 0;
@@ -32,7 +32,7 @@ public class MessageListener extends Thread {
                     count++;
                 }
             }
-            if ( count > 0 ){System.out.println("NOTIFY: " + count);
+            if ( count > 0 && announceNewMessages ){
                 Main.notifyNewMessages(count);
             }
         }
@@ -45,14 +45,16 @@ public class MessageListener extends Thread {
 
     public void run(){
         UserService userService = new UserService();
+        boolean announceNewMessages = false;
         for( ; ; ){
             try{
                 if ( userService.isUserLoggedIn(false) ){
-                    this.fetchNewMessages();
-                    MainController.setOffline(false);
+                    this.fetchNewMessages(announceNewMessages);
                     synchronized(MessageListener.class){
                         MessageListener.isOnline = true;
                     }
+                    MainController.setOffline(false);
+                    announceNewMessages = true;
                 }
                 Thread.sleep(MessageListener.MESSAGE_FETCH_INTERVAL);
             }catch(UnauthorizedException | UserNotFoundException ex){
