@@ -15,12 +15,14 @@ import java.net.ConnectException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LoginController extends Controller implements Initializable {
     protected static FXMLLoader loader;
     private static Stage stage;
 
-    public static void show() {
+    public static void show(){
         try{
             if ( LoginController.stage == null ){
                 URL url = Objects.requireNonNull(LoginController.class.getClassLoader().getResource("views/login.fxml"));
@@ -59,11 +61,24 @@ public class LoginController extends Controller implements Initializable {
     }
 
     private boolean validate(){
-        String messages = "";
+        Pattern usernamePattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,31}$");
+        Pattern hostnamePattern = Pattern.compile("^[a-zA-Z0-9._-]+\\.[a-zA-Z0-9]+$");
         String username = this.username.getText();
-        if ( username.isEmpty() || username.indexOf("@") <= 0 ){
+        String messages = "";
+        if ( username.isEmpty() ){
             messages += "You must provide a valid username.\n";
-        }else if ( this.password.getText().isEmpty() ){
+        }
+        String[] components = username.split("@");
+        if ( components.length != 2 ){
+            messages += "You must provide a valid username.\n";
+        }else{
+            Matcher usernameMatcher = usernamePattern.matcher(components[0]);
+            Matcher hostnameMatcher = hostnamePattern.matcher(components[1]);
+            if ( !usernameMatcher.matches() || !hostnameMatcher.matches() || components[0].equalsIgnoreCase("system") ){
+                messages += "You must provide a valid username.\n";
+            }
+        }
+        if ( this.password.getText().isEmpty() ){
             messages += "You must provide a valid password.\n";
         }
         if ( !messages.isEmpty() ){

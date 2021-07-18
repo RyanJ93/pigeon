@@ -2,6 +2,7 @@ package pigeonServer.support;
 
 import pigeonServer.Main;
 import pigeonServer.models.Console;
+import java.util.Date;
 
 public class Logger {
     private static boolean debug = false;
@@ -15,6 +16,8 @@ public class Logger {
     }
 
     public static void log(String message){
+        Date currentDate = new Date();
+        message = "[" + currentDate + "]: " + message;
         if ( Main.isIsCLIMode() ){
             System.out.println(message);
         }else{

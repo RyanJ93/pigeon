@@ -200,33 +200,33 @@ public class MainController extends Controller implements Initializable {
     }
 
     private void deleteSelectedMessage(){
-        try{
-            if ( this.selectedMessage != null ){
-                String message = "Do you really wish to delete this message? \nNote that this action is permanent and cannot be undone.";
-                Alert confirmation = MainController.makeConfirmation("Message delete confirmation", message);
-                Optional<ButtonType> result = confirmation.showAndWait();
-                if ( result.isPresent() && result.get() == ButtonType.OK ){
-                    this.selectedMessage.delete();
-                    ObservableList<Message> listEntries = this.messageList.getItems();
-                    for ( int i = 0 ; i < listEntries.size() ; i++ ){
-                        if ( listEntries.get(i).getID().equals(this.selectedMessage.getID()) ){
-                            this.messageList.getItems().remove(i);
-                            break;
+        if ( this.selectedMessage != null && MainController.checkOnlineStatus() ){
+            String message = "Do you really wish to delete this message? \nNote that this action is permanent and cannot be undone.";
+            Optional<ButtonType> result = MainController.makeConfirmation("Message delete confirmation", message).showAndWait();
+            if ( result.isPresent() && result.get() == ButtonType.OK ){
+                new Thread(() -> {
+                    try{
+                        synchronized(this){
+                            String modeName = this.isSentList ? MessageList.MODE_SENT : MessageList.MODE_RECEIVED;
+                            Connector connector = new Connector();
+                            connector.delete(this.selectedMessage.getID(), this.isSentList);
+                            MessageList.getList(modeName).removeMessage(this.selectedMessage);
+                            this.selectedMessage = null;
                         }
+                    }catch(UnauthorizedException | UserNotFoundException ex){
+                        Main.requestLogin();
+                    }catch(Exception ex){
+                        ex.printStackTrace();
+                        Platform.runLater(() -> ex.getAlert().show());
+                    }catch(ConnectException ex){
+                        ex.printStackTrace();
+                        Platform.runLater(() -> MainController.makeConnectionIssueAlert("Unable to delete the message").show());
+                    }catch(IOException ex){
+                        ex.printStackTrace();
+                        Platform.runLater(() -> MainController.makeAlert("Unable to delete the message", "An error occurred while deleting the message, please retry later").show());
                     }
-                }
+                }).start();
             }
-        }catch(UnauthorizedException | UserNotFoundException ex){
-            Main.requestLogin();
-        }catch(Exception ex){
-            ex.printStackTrace();
-            ex.getAlert().show();
-        }catch(ConnectException ex){
-            ex.printStackTrace();
-            MainController.makeConnectionIssueAlert("Unable to delete the message").show();
-        }catch(IOException ex){
-            ex.printStackTrace();
-            MainController.makeAlert("Unable to delete the message", "An error occurred while deleting the message, please retry later").show();
         }
     }
 
@@ -244,15 +244,16 @@ public class MainController extends Controller implements Initializable {
         this.resetMessageViewer();
         if ( message != null ){
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
+            ArrayList<String> recipientList = new ArrayList<>();
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            message.getRecipients().forEach(user -> recipientList.add(user.getUsername() + "@" + Connector.getHostname()));
+            String recipient = recipientList.isEmpty() ? "-" : String.join(", ", recipientList);
+            this.markMenuItem.setText(message.getRead() && !message.getSent() ? "Mark as unread" : "Mark as read");
             this.messageSender.setText(message.getSender().getUsername() + "@" + Connector.getHostname());
             this.messageDate.setText(dateFormat.format(message.getDate()));
-            this.messageSubject.setText(message.getSubject());
-            ArrayList<String> recipientList = new ArrayList<>();
-            message.getRecipients().forEach(user -> recipientList.add(user.getUsername() + "@" + Connector.getHostname()));
-            this.messageRecipient.setText("To: " + String.join(", ", recipientList));
             this.messageBody.getEngine().loadContent(message.getBody());
-            this.markMenuItem.setText(message.getRead() && !message.getSent() ? "Mark as unread" : "Mark as read");
+            this.messageSubject.setText(message.getSubject());
+            this.messageRecipient.setText("To: " + recipient);
             if ( !message.getRead() && !message.getSent() ){
                 this.markSelectedMessage();
             }
@@ -284,16 +285,15 @@ public class MainController extends Controller implements Initializable {
                 MessageList messageList = MessageList.getList(MessageList.MODE_SENT);
                 this.messageList.setItems(messageList.getMessageObservableList());
                 this.changeListMenuItem.setText("Show received messages");
-                messageList.reload();
+                messageList.stopListener().reload();
             }else{
                 MessageList messageList = MessageList.getList(MessageList.MODE_RECEIVED);
                 this.messageList.setItems(messageList.getMessageObservableList());
                 this.changeListMenuItem.setText("Show sent messages");
                 messageList.reload().setupListener();
             }
-            boolean isEmptyList = this.messageList.getItems().size() == 0;
-            this.displayMessage(isEmptyList ? null : this.messageList.getItems().get(0));
-            if ( isEmptyList ){
+            this.displayMessage(this.messageList.getItems().isEmpty() ? null : this.messageList.getItems().get(0));
+            if ( this.messageList.getItems().isEmpty() ){
                 this.messageList.setPlaceholder(new Label("No message found"));
             }
         }catch(UnauthorizedException | UserNotFoundException ex){
@@ -311,55 +311,68 @@ public class MainController extends Controller implements Initializable {
     }
 
     private void markSelectedMessage(){
-        try{
-            if ( this.selectedMessage != null && !this.selectedMessage.getSent() ){
-                boolean read = this.markMenuItem.getText().equals("Mark as read");
-                this.selectedMessage.mark(read);
-                this.markMenuItem.setText(read ? "Mark as unread" : "Mark as read");
-                this.messageList.refresh();
-            }
-        }catch(UnauthorizedException | UserNotFoundException ex){
-            Main.requestLogin();
-        }catch(Exception ex){
-            ex.printStackTrace();
-            ex.getAlert().show();
-        }catch(ConnectException ex){
-            ex.printStackTrace();
-            EditorController.makeConnectionIssueAlert("Unable to fetch messages").show();
-        }catch(IOException ex){
-            ex.printStackTrace();
-            MainController.makeAlert("Unable to fetch messages", "An error occurred while fetching messages, please retry later").show();
+        if ( this.selectedMessage != null && !this.selectedMessage.getSent() && MainController.checkOnlineStatus() ){
+            boolean read = this.markMenuItem.getText().equals("Mark as read");
+            String[] ids = new String[]{this.selectedMessage.getID()};
+            new Thread(() -> {
+                try{
+                    Connector connector = new Connector();
+                    connector.mark(read, ids);
+                    synchronized(this){
+                        this.selectedMessage.setRead(read);
+                    }
+                    this.redrawList();
+                }catch(UnauthorizedException | UserNotFoundException ex){
+                    Main.requestLogin();
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> ex.getAlert().show());
+                }catch(ConnectException ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> MainController.makeConnectionIssueAlert("Unable to mark the message").show());
+                }catch(IOException ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> MainController.makeAlert("Unable to mark messages", "An error occurred while marking the message, please retry later").show());
+                }
+            }).start();
         }
     }
 
-    private void markAllMessagesAsRead(){
-        try{
-            if ( !this.isSentList ){
-                ObservableList<Message> messages = this.messageList.getItems();
-                if ( messages.size() > 0 ){
-                    String[] ids = new String[messages.size()];
-                    Connector connector = new Connector();
-                    for ( int i = 0 ; i < ids.length ; i++ ){
-                        ids[i] = messages.get(i).getID();
-                    }
-                    connector.mark(true, ids);
-                    for ( Message message : messages ){
-                        message.setRead(true);
-                    }
-                    this.messageList.refresh();
-                }
+    private void redrawList(){
+        Platform.runLater(() -> {
+            this.messageList.refresh();
+            if ( this.selectedMessage != null && !this.selectedMessage.getSent() ){
+                this.markMenuItem.setText(this.selectedMessage.getRead() ? "Mark as unread" : "Mark as read");
             }
-        }catch(UnauthorizedException | UserNotFoundException ex){
-            Main.requestLogin();
-        }catch(Exception ex){
-            ex.printStackTrace();
-            ex.getAlert().show();
-        }catch(ConnectException ex){
-            ex.printStackTrace();
-            EditorController.makeConnectionIssueAlert("Unable to fetch messages").show();
-        }catch(IOException ex){
-            ex.printStackTrace();
-            MainController.makeAlert("Unable to fetch messages", "An error occurred while fetching messages, please retry later").show();
+        });
+    }
+
+    private void markAllMessagesAsRead(){
+        ObservableList<Message> messages = this.messageList.getItems();
+        if ( !this.isSentList && messages.size() > 0 && MainController.checkOnlineStatus() ){
+            String[] ids = new String[messages.size()];
+            for ( int i = 0 ; i < ids.length ; i++ ){
+                ids[i] = messages.get(i).getID();
+            }
+            new Thread(() -> {
+                try{
+                    Connector connector = new Connector();
+                    connector.mark(true, ids);
+                    MessageList.getList(MessageList.MODE_RECEIVED).setReadForAll(true);
+                    this.redrawList();
+                }catch(UnauthorizedException | UserNotFoundException ex){
+                    Main.requestLogin();
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> ex.getAlert().show());
+                }catch(ConnectException ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> MainController.makeConnectionIssueAlert("Unable to mark messages").show());
+                }catch(IOException ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> MainController.makeAlert("Unable to fetch messages", "An error occurred while fetching messages, please retry later").show());
+                }
+            }).start();
         }
     }
 
@@ -393,9 +406,7 @@ public class MainController extends Controller implements Initializable {
     }
 
     public MainController reset(){
-        this.messageList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            this.displayMessage(observable.getValue());
-        });
+        this.messageList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.displayMessage(observable.getValue()));
         try{
             this.messageList.setCellFactory(messageCardController -> new MessageCardController());
             UserService userService = new UserService();

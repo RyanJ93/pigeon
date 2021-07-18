@@ -4,7 +4,6 @@ import pigeon.exceptions.Exception;
 import pigeon.models.User;
 import pigeon.support.Connector;
 import pigeon.support.MessageList;
-
 import java.io.*;
 
 public class UserService extends Service {

@@ -63,9 +63,7 @@ public class Main extends Application {
     private void setup(){
         final String os = System.getProperty("os.name");
         if ( os != null && os.toLowerCase(Locale.ROOT).startsWith("mac") ){
-            Desktop.getDesktop().setAboutHandler(e -> {
-                AboutController.show();
-            });
+            Desktop.getDesktop().setAboutHandler(e -> AboutController.show());
         }
     }
 
