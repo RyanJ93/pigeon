@@ -1,10 +1,12 @@
 package pigeon.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
@@ -14,7 +16,6 @@ import pigeon.exceptions.UnauthorizedException;
 import pigeon.exceptions.UserNotFoundException;
 import pigeon.models.Message;
 import pigeon.models.User;
-import pigeon.services.MessageService;
 import pigeon.services.UserService;
 import pigeon.support.Connector;
 import pigeon.support.MessageList;
@@ -71,6 +72,9 @@ public class EditorController extends Controller implements Initializable {
     @FXML
     private HTMLEditor body;
 
+    @FXML
+    private Button sendButton;
+
     private Message contextMessage;
     private int messageHandlingMode;
 
@@ -103,30 +107,35 @@ public class EditorController extends Controller implements Initializable {
     }
 
     private void sendMessage(){
-        try{
-            if ( this.validate() ){
-                ArrayList<String> recipients = MessageUtils.getRecipientsFromString(this.recipients.getText());
-                String subject = this.subject.getText();
-                String body = this.body.getHtmlText();
-                MessageService messageService = new MessageService();
-                Message message = messageService.send(recipients, subject, body);
-                MessageList.getList(MessageList.MODE_SENT).addMessage(message);
-                EditorController.makeAlert("Message sent", "Your message has been sent to recipients.").showAndWait().ifPresent(rs -> {
-                    EditorController.hide();
-                    this.reset();
-                });
-            }
-        }catch(UnauthorizedException | UserNotFoundException ex){
-            Main.requestLogin();
-        }catch(Exception ex){
-            ex.printStackTrace();
-            ex.getAlert().show();
-        }catch(ConnectException ex){
-            ex.printStackTrace();
-            EditorController.makeConnectionIssueAlert("Unable to send the message").show();
-        }catch(IOException ex){
-            ex.printStackTrace();
-            EditorController.makeAlert("Unable to send the message", "An error occurred while sending your message, please retry later").show();
+        if ( this.validate() && EditorController.checkOnlineStatus() ){
+            this.sendButton.setDisable(true);
+            ArrayList<String> recipients = MessageUtils.getRecipientsFromString(this.recipients.getText());
+            String subject = this.subject.getText();
+            String body = this.body.getHtmlText();
+            new Thread(() -> {
+                try{
+                    Connector connector = new Connector();
+                    Message message = connector.send(recipients, subject, body);
+                    MessageList.getList(MessageList.MODE_SENT).addMessage(message);
+                    Platform.runLater(() -> EditorController.makeAlert("Message sent", "Your message has been sent to recipients.").showAndWait().ifPresent(rs -> {
+                        EditorController.hide();
+                        this.reset();
+                    }));
+                }catch(UnauthorizedException | UserNotFoundException ex){
+                    Main.requestLogin();
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> ex.getAlert().show());
+                }catch(ConnectException ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> EditorController.makeConnectionIssueAlert("Unable to send the message").show());
+                }catch(IOException ex){
+                    ex.printStackTrace();
+                    Platform.runLater(() -> EditorController.makeAlert("Unable to send the message", "An error occurred while sending your message, please retry later").show());
+                }finally{
+                    Platform.runLater(() -> this.sendButton.setDisable(false));
+                }
+            }).start();
         }
     }
 

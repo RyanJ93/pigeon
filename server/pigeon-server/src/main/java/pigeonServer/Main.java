@@ -34,7 +34,7 @@ public class Main extends Application {
             URL url = this.getClass().getClassLoader().getResource("views/console.fxml");
             Parent root = FXMLLoader.load(Objects.requireNonNull(url));
             primaryStage.setTitle("Pigeon server console");
-            primaryStage.setScene(new Scene(root, 800, 600));
+            primaryStage.setScene(new Scene(root, 900, 500));
             primaryStage.setResizable(false);
             primaryStage.show();
         }

@@ -1,22 +1,27 @@
 package pigeonServer.models;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableStringValue;
 
 public class Console {
-    private static final Console activeConsole = new Console();
+    private static Console activeConsole;
     private final StringProperty contents = new SimpleStringProperty();
 
     public static Console getActiveConsole(){
+        if ( Console.activeConsole == null ){
+            Console.activeConsole = new Console();
+        }
         return Console.activeConsole;
     }
 
-    public Console write(String log){
-        String contents = this.getContents();
-        contents = contents == null ? ( log + "\n" ) : ( contents + log + "\n" );
-        this.contents.set(contents);
-        return this;
+    public void write(String log){
+        Platform.runLater(() -> {
+            String contents = this.getContents();
+            contents = contents == null ? ( log + "\n" ) : ( contents + log + "\n" );
+            this.contents.set(contents);
+        });
     }
 
     public String getContents(){

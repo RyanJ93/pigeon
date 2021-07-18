@@ -1,7 +1,5 @@
 package pigeon.support;
 
-import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import pigeon.Main;
 import pigeon.controllers.MainController;
 import pigeon.exceptions.Exception;
@@ -12,13 +10,17 @@ import pigeon.services.UserService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MessageListener extends Thread {
     private static final int MESSAGE_FETCH_INTERVAL = 3000;
 
-    private MessageList messageList;
+    private static boolean isOnline = false;
+
+    public static synchronized boolean isOnline(){
+        return MessageListener.isOnline;
+    }
+
+    private final MessageList messageList;
     private Date lastFetchDate;
 
     private void fetchNewMessages() throws IOException, Exception {
@@ -30,7 +32,7 @@ public class MessageListener extends Thread {
                     count++;
                 }
             }
-            if ( count > 0 ){
+            if ( count > 0 ){System.out.println("NOTIFY: " + count);
                 Main.notifyNewMessages(count);
             }
         }
@@ -48,12 +50,18 @@ public class MessageListener extends Thread {
                 if ( userService.isUserLoggedIn(false) ){
                     this.fetchNewMessages();
                     MainController.setOffline(false);
+                    synchronized(MessageListener.class){
+                        MessageListener.isOnline = true;
+                    }
                 }
                 Thread.sleep(MessageListener.MESSAGE_FETCH_INTERVAL);
             }catch(UnauthorizedException | UserNotFoundException ex){
                 Main.requestLogin();
             }catch(IOException ex){
                 MainController.setOffline(true);
+                synchronized(MessageListener.class){
+                    MessageListener.isOnline = false;
+                }
             }catch(InterruptedException ex){
                 break;
             }catch(Exception ex){

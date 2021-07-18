@@ -1,4 +1,3 @@
 package pigeon.models;
 
-public class Model {
-}
+public abstract class Model {}

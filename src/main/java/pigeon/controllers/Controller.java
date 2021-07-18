@@ -2,9 +2,9 @@ package pigeon.controllers;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import pigeon.support.MessageListener;
 
 public abstract class Controller {
-
     protected static Alert makeAlert(String title, String content){
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle(title);
@@ -24,5 +24,14 @@ public abstract class Controller {
         alert.setHeaderText("");
         alert.setContentText(content);
         return alert;
+    }
+
+    protected static boolean checkOnlineStatus(){
+        boolean isOnline = MessageListener.isOnline();
+        if ( !isOnline ){
+            Alert alert = Controller.makeConnectionIssueAlert("Operation cannot be pursued");
+            alert.show();
+        }
+        return isOnline;
     }
 }

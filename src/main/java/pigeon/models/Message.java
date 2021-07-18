@@ -117,21 +117,4 @@ public class Message extends Model {
     public boolean getSent(){
         return this.sent;
     }
-
-    public Message mark(boolean read) throws IOException, Exception {
-        if ( this.id != null ){
-            Connector connector = new Connector();
-            connector.mark(read, new String[]{this.id});
-            this.read = read;
-        }
-        return this;
-    }
-
-    public Message delete() throws IOException, Exception {
-        if ( this.id != null ){
-            Connector connector = new Connector();
-            connector.delete(this.id, this.sent);
-        }
-        return this;
-    }
 }

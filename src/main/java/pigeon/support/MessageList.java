@@ -33,10 +33,10 @@ public class MessageList {
         return list;
     }
 
-    private ObservableList<Message> messageObservableList;
-    private HashSet<String> messageIndex;
-    private String mode = "received";
+    private final ObservableList<Message> messageObservableList;
     private MessageListener messageListener = null;
+    private final HashSet<String> messageIndex;
+    private String mode = "received";
 
     private MessageList(String mode){
         this.messageObservableList = FXCollections.observableArrayList();
@@ -68,10 +68,30 @@ public class MessageList {
         return inserted.get();
     }
 
+    public void removeMessage(Message message){
+        Platform.runLater(() -> {
+            this.messageIndex.remove(message.getID());
+            for ( int i = 0 ; i < this.messageObservableList.size() ; i++ ){
+                if ( this.messageObservableList.get(i).getID().equals(message.getID()) ){
+                    this.messageObservableList.remove(i);
+                    break;
+                }
+            }
+        });
+    }
+
+    public void setReadForAll(boolean read){
+        Platform.runLater(() -> {
+            for ( Message message : this.messageObservableList ){
+                message.setRead(read);
+            }
+        });
+    }
+
     public MessageList reload() throws IOException, Exception {
+        boolean isSentList = this.mode.equals(MessageList.MODE_SENT);
         this.messageObservableList.clear();
         this.messageIndex.clear();
-        boolean isSentList = this.mode.equals(MessageList.MODE_SENT);
         ArrayList<Message> messages = isSentList ? Message.getSent(null, false) : Message.getReceived(null, false);
         if ( messages != null ){
             for ( Message message : messages ){

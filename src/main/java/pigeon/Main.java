@@ -46,7 +46,7 @@ public class Main extends Application {
     }
 
     public static void notifyNewMessages(int count){
-        Platform.runLater(() -> {
+        Platform.runLater(() -> {System.out.println("NEW MESSAGE");
             URL url = Objects.requireNonNull(Main.class.getClassLoader().getResource("assets/notification.wav"));
             String content = "You have received " + count + " new message" + ( count == 1 ? "." : "s." );
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -63,9 +63,7 @@ public class Main extends Application {
     private void setup(){
         final String os = System.getProperty("os.name");
         if ( os != null && os.toLowerCase(Locale.ROOT).startsWith("mac") ){
-            Desktop.getDesktop().setAboutHandler(e -> {
-                AboutController.show();
-            });
+            Desktop.getDesktop().setAboutHandler(e -> AboutController.show());
         }
     }
 

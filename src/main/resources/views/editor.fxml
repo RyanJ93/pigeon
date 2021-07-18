@@ -21,7 +21,7 @@
          </font>
       </TextField>
       <HTMLEditor fx:id="body" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" layoutX="12.0" layoutY="131.0" prefHeight="419.0" prefWidth="776.0" />
-      <Button layoutX="739.0" layoutY="561.0" mnemonicParsing="false" onAction="#handleSendAction" text="Send" />
+      <Button fx:id="sendButton" layoutX="739.0" layoutY="561.0" mnemonicParsing="false" onAction="#handleSendAction" text="Send" />
       <Button layoutX="12.0" layoutY="561.0" mnemonicParsing="false" onAction="#handleDiscardAction" text="Discard" />
       <Label layoutX="12.0" layoutY="14.0" text="Compose new message">
          <font>

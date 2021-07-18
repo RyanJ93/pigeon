@@ -20,7 +20,7 @@ public class LoginController extends Controller implements Initializable {
     protected static FXMLLoader loader;
     private static Stage stage;
 
-    public static void show() {
+    public static void show(){
         try{
             if ( LoginController.stage == null ){
                 URL url = Objects.requireNonNull(LoginController.class.getClassLoader().getResource("views/login.fxml"));
@@ -74,7 +74,7 @@ public class LoginController extends Controller implements Initializable {
 
     private void login(){
         try{
-            if ( this.validate() ){
+            if ( this.validate() && LoginController.checkOnlineStatus() ){
                 UserService userService = new UserService();
                 User user = userService.login(this.username.getText(), this.password.getText());
                 if ( user != null ){

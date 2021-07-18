@@ -13,6 +13,8 @@ import java.util.*;
 
 public class StorageService extends Service {
     public static final String STORAGE_DIRECTORY_PATH = "storage/";
+    public static final int ORDER_BY_DESC = -1;
+    public static final int ORDER_BY_ASC = 1;
 
     private static String generateKeyHash(String key){
         try{
@@ -113,9 +115,6 @@ public class StorageService extends Service {
     public String getEntity(){
         return this.entity;
     }
-
-    public static final int ORDER_BY_DESC = -1;
-    public static final int ORDER_BY_ASC = 1;
 
     public ArrayList<HashMap<String, String>> find(String[] keys, String orderByField, int orderByDirection) throws IOException {
         ArrayList<HashMap<String, String>> documents = new ArrayList<>();

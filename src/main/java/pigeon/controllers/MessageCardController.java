@@ -7,8 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.Pane;
 import pigeon.models.Message;
-import pigeon.support.Connector;
-
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
