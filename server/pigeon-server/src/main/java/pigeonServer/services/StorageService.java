@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import pigeonServer.support.FileLocker;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -45,9 +46,13 @@ public class StorageService extends Service {
     }
 
     private static HashMap<String, String> extractDocumentFromFile(String path) throws IOException {
+        FileLocker fileLocker = FileLocker.getInstance();
         BufferedReader bufferedReader = null;
+        boolean isLockAcquired = false;
         try{
             StringBuilder stringBuilder = new StringBuilder();
+            fileLocker.acquire(path);
+            isLockAcquired = true;
             bufferedReader = new BufferedReader(new FileReader(path));
             String line;
             while ( ( line = bufferedReader.readLine() ) != null ){
@@ -61,7 +66,12 @@ public class StorageService extends Service {
                 document.put(property.getKey(), property.getValue().getAsString());
             }
             return document;
+        }catch(InterruptedException ex){
+            throw new IOException("Unable to acquire file lock.");
         }finally{
+            if ( isLockAcquired ){
+                fileLocker.release(path);
+            }
             if ( bufferedReader != null ){
                 bufferedReader.close();
             }
@@ -161,12 +171,25 @@ public class StorageService extends Service {
 
     public int deleteMany(String[] keys) throws IOException {
         HashSet<String> hashedKeys = StorageService.generateHashedKeySet(keys);
+        FileLocker fileLocker = FileLocker.getInstance();
         String basePath = this.getBasePath();
         int counter = 0;
         for ( String hashedKey : hashedKeys ){
-            File documentFile = new File(basePath + "/" + hashedKey + ".json");
-            if ( documentFile.exists() && documentFile.isFile() && documentFile.delete() ){
-                counter++;
+            String path = basePath + "/" + hashedKey + ".json";
+            boolean isLockAcquired = false;
+            try{
+                fileLocker.acquire(path);
+                isLockAcquired = true;
+                File documentFile = new File(path);
+                if ( documentFile.exists() && documentFile.isFile() && documentFile.delete() ){
+                    counter++;
+                }
+            }catch(InterruptedException ex){
+                throw new IOException("Unable to acquire file lock.");
+            }finally{
+                if ( isLockAcquired ){
+                    fileLocker.release(path);
+                }
             }
         }
         return counter;
@@ -180,13 +203,23 @@ public class StorageService extends Service {
         if ( this.exists(key) ){
             throw new IllegalArgumentException("Duplicate key found.");
         }
+        String path = this.getBasePath() + "/" + StorageService.generateKeyHash(key) + ".json";
+        FileLocker fileLocker = FileLocker.getInstance();
+        boolean isLockAcquired = false;
         FileWriter fileWriter = null;
         int counter = 0;
         try{
-            fileWriter = new FileWriter(this.getBasePath() + "/" + StorageService.generateKeyHash(key) + ".json");
+            fileLocker.acquire(path);
+            isLockAcquired = true;
+            fileWriter = new FileWriter(path);
             fileWriter.write(StorageService.serializeDocument(data));
             counter++;
+        }catch(InterruptedException ex){
+            throw new IOException("Unable to acquire file lock.");
         }finally{
+            if ( isLockAcquired ){
+                fileLocker.release(path);
+            }
             if ( fileWriter != null ){
                 fileWriter.close();
             }
@@ -196,22 +229,31 @@ public class StorageService extends Service {
 
     public int update(String key, HashMap<String, String> data, boolean replace) throws IOException {
         String path = this.getBasePath() + "/" + StorageService.generateKeyHash(key) + ".json";
-        File documentFile = new File(path);
+        FileLocker fileLocker = FileLocker.getInstance();
+        boolean isLockAcquired = false;
         FileWriter fileWriter = null;
         int counter = 0;
-        if ( documentFile.exists() && documentFile.isFile() ){
-            if ( !replace ){
-                HashMap<String, String> document = StorageService.extractDocumentFromFile(path);
-                data = StorageService.mergeDocuments(document, data);
-            }
-            try{
+        try{
+            fileLocker.acquire(path);
+            isLockAcquired = true;
+            File documentFile = new File(path);
+            if ( documentFile.exists() && documentFile.isFile() ){
+                if ( !replace ){
+                    HashMap<String, String> document = StorageService.extractDocumentFromFile(path);
+                    data = StorageService.mergeDocuments(document, data);
+                }
                 fileWriter = new FileWriter(documentFile);
                 fileWriter.write(StorageService.serializeDocument(data));
                 counter++;
-            }finally{
-                if ( fileWriter != null ){
-                    fileWriter.close();
-                }
+            }
+        }catch(InterruptedException ex){
+            throw new IOException("Unable to acquire file lock.");
+        }finally{
+            if ( isLockAcquired ){
+                fileLocker.release(path);
+            }
+            if ( fileWriter != null ){
+                fileWriter.close();
             }
         }
         return counter;
