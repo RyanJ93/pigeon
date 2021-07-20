@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import pigeonServer.support.FileLocker;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -46,14 +47,13 @@ public class StorageService extends Service {
     }
 
     private static HashMap<String, String> extractDocumentFromFile(String path) throws IOException {
-        FileLocker fileLocker = FileLocker.getInstance();
         BufferedReader bufferedReader = null;
-        boolean isLockAcquired = false;
+        FileLock fileLock = null;
         try{
             StringBuilder stringBuilder = new StringBuilder();
-            fileLocker.acquire(path);
-            isLockAcquired = true;
-            bufferedReader = new BufferedReader(new FileReader(path));
+            FileInputStream fileInputStream = new FileInputStream(path);
+            fileLock = fileInputStream.getChannel().lock(0, Long.MAX_VALUE, true);
+            bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
             String line;
             while ( ( line = bufferedReader.readLine() ) != null ){
                 stringBuilder.append(line);
@@ -66,11 +66,11 @@ public class StorageService extends Service {
                 document.put(property.getKey(), property.getValue().getAsString());
             }
             return document;
-        }catch(InterruptedException ex){
+        }catch(OverlappingFileLockException ex){
             throw new IOException("Unable to acquire file lock.");
         }finally{
-            if ( isLockAcquired ){
-                fileLocker.release(path);
+            if ( fileLock != null ){
+                fileLock.release();
             }
             if ( bufferedReader != null ){
                 bufferedReader.close();
@@ -171,25 +171,13 @@ public class StorageService extends Service {
 
     public int deleteMany(String[] keys) throws IOException {
         HashSet<String> hashedKeys = StorageService.generateHashedKeySet(keys);
-        FileLocker fileLocker = FileLocker.getInstance();
         String basePath = this.getBasePath();
         int counter = 0;
         for ( String hashedKey : hashedKeys ){
             String path = basePath + "/" + hashedKey + ".json";
-            boolean isLockAcquired = false;
-            try{
-                fileLocker.acquire(path);
-                isLockAcquired = true;
-                File documentFile = new File(path);
-                if ( documentFile.exists() && documentFile.isFile() && documentFile.delete() ){
-                    counter++;
-                }
-            }catch(InterruptedException ex){
-                throw new IOException("Unable to acquire file lock.");
-            }finally{
-                if ( isLockAcquired ){
-                    fileLocker.release(path);
-                }
+            File documentFile = new File(path);
+            if ( documentFile.exists() && documentFile.isFile() && documentFile.delete() ){
+                counter++;
             }
         }
         return counter;
@@ -204,24 +192,22 @@ public class StorageService extends Service {
             throw new IllegalArgumentException("Duplicate key found.");
         }
         String path = this.getBasePath() + "/" + StorageService.generateKeyHash(key) + ".json";
-        FileLocker fileLocker = FileLocker.getInstance();
-        boolean isLockAcquired = false;
-        FileWriter fileWriter = null;
+        FileOutputStream fileOutputStream = null;
+        FileLock fileLock = null;
         int counter = 0;
         try{
-            fileLocker.acquire(path);
-            isLockAcquired = true;
-            fileWriter = new FileWriter(path);
-            fileWriter.write(StorageService.serializeDocument(data));
+            fileOutputStream = new FileOutputStream(path);
+            fileLock = fileOutputStream.getChannel().lock();
+            fileOutputStream.write(StorageService.serializeDocument(data).getBytes(StandardCharsets.UTF_8));
             counter++;
-        }catch(InterruptedException ex){
+        }catch(OverlappingFileLockException ex){
             throw new IOException("Unable to acquire file lock.");
         }finally{
-            if ( isLockAcquired ){
-                fileLocker.release(path);
+            if ( fileLock != null ){
+                fileLock.release();
             }
-            if ( fileWriter != null ){
-                fileWriter.close();
+            if ( fileOutputStream != null ){
+                fileOutputStream.close();
             }
         }
         return counter;
@@ -229,31 +215,29 @@ public class StorageService extends Service {
 
     public int update(String key, HashMap<String, String> data, boolean replace) throws IOException {
         String path = this.getBasePath() + "/" + StorageService.generateKeyHash(key) + ".json";
-        FileLocker fileLocker = FileLocker.getInstance();
-        boolean isLockAcquired = false;
-        FileWriter fileWriter = null;
+        FileOutputStream fileOutputStream = null;
+        FileLock fileLock = null;
         int counter = 0;
         try{
-            fileLocker.acquire(path);
-            isLockAcquired = true;
             File documentFile = new File(path);
             if ( documentFile.exists() && documentFile.isFile() ){
                 if ( !replace ){
                     HashMap<String, String> document = StorageService.extractDocumentFromFile(path);
                     data = StorageService.mergeDocuments(document, data);
                 }
-                fileWriter = new FileWriter(documentFile);
-                fileWriter.write(StorageService.serializeDocument(data));
+                fileOutputStream = new FileOutputStream(path);
+                fileLock = fileOutputStream.getChannel().lock();
+                fileOutputStream.write(StorageService.serializeDocument(data).getBytes(StandardCharsets.UTF_8));
                 counter++;
             }
-        }catch(InterruptedException ex){
+        }catch(OverlappingFileLockException ex){
             throw new IOException("Unable to acquire file lock.");
         }finally{
-            if ( isLockAcquired ){
-                fileLocker.release(path);
+            if ( fileLock != null ){
+                fileLock.release();
             }
-            if ( fileWriter != null ){
-                fileWriter.close();
+            if ( fileOutputStream != null ){
+                fileOutputStream.close();
             }
         }
         return counter;
