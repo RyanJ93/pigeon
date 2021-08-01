@@ -3,22 +3,26 @@
 Pigeon is a simple email-like messaging application developed as an academic project using Java and JavaFX.<br />
 It allows you to exchange messages in the same fashion you are used to with regular emails.
 
+## Requirements
+
+- Java 15 or greater
+- Gradle 7
+
 ## Building the client
 
-The project's dependencies and building strategy is managed by Gradle, however you may need to set up the Gradle wrapper, you can set up the wrapper using the command `gradle wrapper` directly in the project root directory.<br />
-You can run the application invoking the task "run", for instance:
+The project's dependencies and building strategy is managed by Gradle, you can run the client by running the following command:
 
 ```bash
-./gradlew run
+gradle run
 ```
 
-Or on Windows:
+Similarly you can build a "fatjar" using the following command:
 
-```cmd
-gradlew.bat run
+```bash
+gradle jar
 ```
 
-Similarly, you can build a "fatjar" invoking the "jar" task.
+It will produce a .jar file located at `build/libs/pigeon-0.0.1.jar`.
 
 ### Login
 
@@ -33,12 +37,15 @@ Server will listen on port 2898, so you may need to adjust your firewall setting
 The Pigeon server can be run without a GUI too by passing the --no-gui parameter, useful when running on a CLI-only server.
 
 ### The Pigeon server as a Docker image
+
 You can build and then run a Docker image out of this project: all you need is to invoke the `docker build` command on the server directory and then you are free to run the image built. <br />
 You may want to change the storage directory when running as a Docker container, to do that simply mount your directory as a volume, here's an example:
 
 ```bash
 docker run -p 2898:2898 -v /path/to/storage/dir:/storage -d --name pigeon-server enricosola/pigeon-server:latest
 ```
+
+If you don't want to build your own Docker image you can use a pre-built image, have a look at [this page](https://hub.docker.com/repository/docker/enricosola/pigeon-server) for more information.
 
 ### Creating users
 You can add new Pigeon users by running the server with the `--useradd` option plus the username and password for the user to be added, for instance:
