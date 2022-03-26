@@ -97,4 +97,4 @@ Additionally, messages are stored as files, while it may sound like a bad practi
 
 Tested on Apple macOS and RedHat Enterprise Linux 8, currently not tested on Microsoft Windows.
 
-Developed with ❤️ by [Enrico Sola](https://www.enricosola.com).
+Developed with ❤️ by [Enrico Sola](https://www.enricosola.dev).

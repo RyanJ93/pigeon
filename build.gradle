@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
 }
 
 group 'com.pigeon'
@@ -11,8 +11,8 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = 15
-targetCompatibility = 15
+sourceCompatibility = 17
+targetCompatibility = 17
 mainClassName = 'pigeon.Launcher'
 
 application {
@@ -20,13 +20,13 @@ application {
 }
 
 javafx {
-    version = "16"
+    version = "17"
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'org.jsoup:jsoup:1.14.3'
 }
 
 jar {
