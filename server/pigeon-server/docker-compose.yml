@@ -1,0 +1,13 @@
+name: "pigeon"
+services:
+    server:
+        image: enricosola/pigeon-server:latest
+        ports:
+            - "2898:2898"
+        volumes:
+            - "./storage:/storage"
+        networks:
+            - pigeon-network
+networks:
+    pigeon-network:
+        driver: bridge
